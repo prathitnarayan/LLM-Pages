@@ -5,60 +5,111 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weather Dashboard</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; background-color: #f0f0f0; }
-        .container { max-width: 600px; width: 100%; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); }
-        input { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; }
-        button { width: 100%; padding: 10px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
-        button:hover { background: #0056b3; }
-        .weather-info { margin-top: 20px; }
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+        header { background: #007bff; color: white; padding: 1rem; text-align: center; }
+        .container { padding: 1rem; max-width: 600px; margin: auto; }
+        .search { display: flex; margin-bottom: 1rem; }
+        .search input { flex: 1; padding: 0.5rem; }
+        .search button { padding: 0.5rem; }
+        .weather-info { display: none; }
         .error { color: red; }
-        @media (max-width: 600px) { button { font-size: 14px; } }
+        @media (max-width: 600px) {
+            header { font-size: 1.5rem; }
+        }
     </style>
 </head>
 <body>
-    <div class="container" role="main">
+    <header>
         <h1>Weather Dashboard</h1>
-        <input type="text" id="city" placeholder="Enter city name" aria-label="City name">
-        <button id="search" aria-label="Search weather">Get Weather</button>
-        <div class="weather-info" id="weather-info" aria-live="polite"></div>
-        <div class="error" id="error" aria-live="assertive"></div>
+    </header>
+    <div class="container">
+        <div class="search" aria-label="Search for city">
+            <input type="text" id="city" placeholder="Enter city name" aria-required="true" />
+            <button id="searchBtn">Search</button>
+        </div>
+        <div id="weather" class="weather-info">
+            <h2 id="cityName"></h2>
+            <p>Temperature: <span id="temperature"></span>°C</p>
+            <p>Humidity: <span id="humidity"></span>%</p>
+            <img id="weatherIcon" alt="Weather icon" />
+        </div>
+        <div class="error" id="error" role="alert"></div>
+        <button id="settingsBtn">⚙️</button>
     </div>
+
+    <div id="settingsModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.7); padding:2rem; color:white;">
+        <h2>Settings</h2>
+        <p>Please enter your OpenWeatherMap API Key: <a href="https://openweathermap.org/appid" target="_blank" style="color:yellow;">Get API Key</a></p>
+        <input type="text" id="apiKeyInput" placeholder="API Key" aria-required="true" />
+        <button id="saveApiKey">Save</button>
+        <button id="closeModal">Close</button>
+    </div>
+
     <script>
-        document.getElementById('search').addEventListener('click', () => {
-            const city = document.getElementById('city').value.trim();
-            const errorDiv = document.getElementById('error');
-            const weatherInfo = document.getElementById('weather-info');
+        document.addEventListener("DOMContentLoaded", function () {
+            const apiKey = localStorage.getItem('weatherApiKey');
+            const settingsModal = document.getElementById('settingsModal');
+            const errorDisplay = document.getElementById('error');
 
-            errorDiv.textContent = '';
-            weatherInfo.textContent = '';
-
-            if (!city) {
-                errorDiv.textContent = 'Please enter a city name.';
-                return;
+            function showError(message) {
+                errorDisplay.textContent = message;
             }
 
-            const apiKey = 'YOUR_API_KEY'; // Replace with your OpenWeatherMap API key
-            const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+            function hideError() {
+                errorDisplay.textContent = '';
+            }
 
-            fetch(url)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('City not found');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    const { main, weather } = data;
-                    weatherInfo.innerHTML = `
-                        <h2>${data.name}</h2>
-                        <p>Temperature: ${main.temp} °C</p>
-                        <p>Humidity: ${main.humidity}%</p>
-                        <img src="http://openweathermap.org/img/wn/${weather[0].icon}.png" alt="${weather[0].description}">
-                    `;
-                })
-                .catch(error => {
-                    errorDiv.textContent = error.message;
-                });
+            if (!apiKey) {
+                settingsModal.style.display = 'block';
+            }
+
+            document.getElementById('searchBtn').addEventListener('click', function () {
+                const city = document.getElementById('city').value;
+                if (!city) {
+                    showError('Please enter a city name.');
+                    return;
+                }
+                fetchWeather(city);
+            });
+
+            document.getElementById('saveApiKey').addEventListener('click', function () {
+                const key = document.getElementById('apiKeyInput').value;
+                if (key) {
+                    localStorage.setItem('weatherApiKey', key);
+                    settingsModal.style.display = 'none';
+                } else {
+                    showError('API Key cannot be empty.');
+                }
+            });
+
+            document.getElementById('closeModal').addEventListener('click', function () {
+                settingsModal.style.display = 'none';
+            });
+
+            document.getElementById('settingsBtn').addEventListener('click', function () {
+                settingsModal.style.display = 'block';
+            });
+
+            function fetchWeather(city) {
+                const apiKey = localStorage.getItem('weatherApiKey');
+                fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Failed to fetch weather data. Please check your API key or city name.');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        hideError();
+                        document.getElementById('cityName').textContent = data.name;
+                        document.getElementById('temperature').textContent = data.main.temp;
+                        document.getElementById('humidity').textContent = data.main.humidity;
+                        document.getElementById('weatherIcon').src = `https://openweathermap.org/img/wn/${data.weather[0].icon}.png`;
+                        document.getElementById('weatherIcon').alt = data.weather[0].description;
+                        document.getElementById('weather').style.display = 'block';
+                    })
+                    .catch(error => showError(error.message));
+            }
         });
     </script>
 </body>
