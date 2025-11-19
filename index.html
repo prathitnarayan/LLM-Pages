@@ -5,52 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weather Dashboard</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; }
-        header { background: #007bff; color: white; padding: 1rem; width: 100%; text-align: center; }
-        main { padding: 1rem; width: 100%; max-width: 600px; }
-        input { padding: 0.5rem; width: calc(100% - 1rem); margin-bottom: 1rem; }
-        button { padding: 0.5rem; background: #28a745; color: white; border: none; cursor: pointer; }
-        button:hover { background: #218838; }
-        .weather-info { display: none; margin-top: 1rem; }
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; background-color: #f0f0f0; }
+        .container { max-width: 600px; width: 100%; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); }
+        input { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; }
+        button { width: 100%; padding: 10px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .weather-info { margin-top: 20px; }
         .error { color: red; }
-        @media (max-width: 600px) {
-            input, button { width: 100%; }
-        }
+        @media (max-width: 600px) { button { font-size: 14px; } }
     </style>
 </head>
 <body>
-    <header>
+    <div class="container" role="main">
         <h1>Weather Dashboard</h1>
-    </header>
-    <main>
-        <input type="text" id="city" placeholder="Enter city name" aria-label="City name input">
-        <button id="searchBtn" aria-label="Search for weather">Get Weather</button>
+        <input type="text" id="city" placeholder="Enter city name" aria-label="City name">
+        <button id="search" aria-label="Search weather">Get Weather</button>
+        <div class="weather-info" id="weather-info" aria-live="polite"></div>
         <div class="error" id="error" aria-live="assertive"></div>
-        <div class="weather-info" id="weatherInfo" aria-live="polite">
-            <h2 id="location" aria-label="Location"></h2>
-            <p id="temperature" aria-label="Temperature"></p>
-            <p id="humidity" aria-label="Humidity"></p>
-            <img id="weatherIcon" alt="Weather icon">
-        </div>
-    </main>
+    </div>
     <script>
-        document.getElementById('searchBtn').addEventListener('click', () => {
+        document.getElementById('search').addEventListener('click', () => {
             const city = document.getElementById('city').value.trim();
-            const errorElement = document.getElementById('error');
-            const weatherInfoElement = document.getElementById('weatherInfo');
-            const locationElement = document.getElementById('location');
-            const temperatureElement = document.getElementById('temperature');
-            const humidityElement = document.getElementById('humidity');
-            const weatherIconElement = document.getElementById('weatherIcon');
-            errorElement.textContent = '';
-            weatherInfoElement.style.display = 'none';
+            const errorDiv = document.getElementById('error');
+            const weatherInfo = document.getElementById('weather-info');
+
+            errorDiv.textContent = '';
+            weatherInfo.textContent = '';
 
             if (!city) {
-                errorElement.textContent = 'Please enter a city name.';
+                errorDiv.textContent = 'Please enter a city name.';
                 return;
             }
 
-            fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=YOUR_API_KEY&units=metric`)
+            const apiKey = 'YOUR_API_KEY'; // Replace with your OpenWeatherMap API key
+            const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+
+            fetch(url)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('City not found');
@@ -58,15 +48,16 @@
                     return response.json();
                 })
                 .then(data => {
-                    locationElement.textContent = `${data.name}, ${data.sys.country}`;
-                    temperatureElement.textContent = `Temperature: ${data.main.temp} °C`;
-                    humidityElement.textContent = `Humidity: ${data.main.humidity}%`;
-                    weatherIconElement.src = `http://openweathermap.org/img/wn/${data.weather[0].icon}.png`;
-                    weatherIconElement.alt = data.weather[0].description;
-                    weatherInfoElement.style.display = 'block';
+                    const { main, weather } = data;
+                    weatherInfo.innerHTML = `
+                        <h2>${data.name}</h2>
+                        <p>Temperature: ${main.temp} °C</p>
+                        <p>Humidity: ${main.humidity}%</p>
+                        <img src="http://openweathermap.org/img/wn/${weather[0].icon}.png" alt="${weather[0].description}">
+                    `;
                 })
                 .catch(error => {
-                    errorElement.textContent = error.message;
+                    errorDiv.textContent = error.message;
                 });
         });
     </script>
