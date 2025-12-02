@@ -1,9 +1,9 @@
 {
-  "task": "unitywolf-gaming-landing",
+  "task": "sales-summary-test",
   "task_id": "",
   "round": 1,
-  "brief": "Create a dark, high-energy gaming channel landing page for UnityWolf Gaming. Include: (1) a prominent text-based logo \"UnityWolf Gaming\" in the header, (2) a hero section with a bold title, short tagline, and a large \"Watch on YouTube\" primary CTA button, (3) social links section with icons or styled links for YouTube, Twitch, Instagram, and X/Twitter, (4) an \"About the Channel\" section describing the type of games and streaming schedule, (5) a \"Contact\" section that shows the email unitywolfgaming@example.com. Page must be responsive and look good on mobile and desktop.",
+  "brief": "Create a page that fetches product-sales.csv, displays each product with its sales amount, calculates and shows total sales in #total-sales element, and lists products in a table with id=sales-table",
   "email": "25ds2000019@ds.study.iitm.ac.in",
-  "deployed_at": "2025-12-02 09:28:30 UTC",
+  "deployed_at": "2025-12-02 15:00:58 UTC",
   "deployment_count": "See commit history"
 }
