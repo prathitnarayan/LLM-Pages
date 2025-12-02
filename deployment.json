@@ -1,9 +1,9 @@
 {
-  "task": "weather-dashboard-app",
+  "task": "sales-summary-test",
   "task_id": "",
   "round": 1,
-  "brief": "Generate a responsive weather dashboard app with city search, temperature, humidity, and weather icons.",
-  "email": "samarjeetkumar@gmail.com",
-  "deployed_at": "2025-11-19 07:01:21 UTC",
+  "brief": "Create a page that fetches product-sales.csv, displays each product with its sales amount, calculates and shows total sales in #total-sales element, and lists products in a table with id=sales-table",
+  "email": "25ds2000019@ds.study.iitm.ac.in",
+  "deployed_at": "2025-12-02 03:00:05 UTC",
   "deployment_count": "See commit history"
 }
