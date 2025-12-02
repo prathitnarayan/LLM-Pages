@@ -3,99 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UnityWolf Gaming</title>
+    <title>Product Sales</title>
     <style>
         body {
-            margin: 0;
             font-family: Arial, sans-serif;
-            color: #fff;
-            background-color: #181818;
-        }
-        header {
             padding: 20px;
-            text-align: center;
-            background-color: #282828;
+            max-width: 600px;
+            margin: auto;
         }
-        h1 {
-            font-size: 2.5rem;
-            margin: 0;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
         }
-        .hero {
-            text-align: center;
-            padding: 60px 20px;
-            background-color: #333;
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
         }
-        .hero h2 {
-            font-size: 2rem;
-            margin: 10px 0;
+        th {
+            background-color: #f2f2f2;
         }
-        .cta-button {
-            background-color: #e63946;
-            color: #fff;
-            padding: 15px 30px;
-            border: none;
-            border-radius: 5px;
-            font-size: 1.2rem;
-            cursor: pointer;
-        }
-        #social-links {
-            text-align: center;
-            margin: 20px 0;
-        }
-        .social-link {
-            margin: 0 10px;
-            color: #e63946;
-            text-decoration: none;
-            font-size: 1.5rem;
-        }
-        .about, .contact {
-            padding: 20px;
-            background-color: #282828;
-            margin: 10px;
-            border-radius: 5px;
-        }
-        @media (max-width: 600px) {
-            h1 {
-                font-size: 2rem;
-            }
-            .hero h2 {
-                font-size: 1.5rem;
-            }
-            .cta-button {
-                font-size: 1rem;
-                padding: 10px 20px;
-            }
+        #total-sales {
+            font-weight: bold;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
-    <header aria-label="Header">
-        <h1>UnityWolf Gaming</h1>
-    </header>
-    <div class="hero" aria-label="Hero Section">
-        <h2>Join the Adventure!</h2>
-        <p>Watch epic gameplay and live streams</p>
-        <button class="cta-button" onclick="window.open('https://www.youtube.com', '_blank')">Watch on YouTube</button>
-    </div>
-    <section id="social-links" aria-label="Social Links">
-        <a href="https://www.youtube.com" class="social-link" aria-label="YouTube">🎥</a>
-        <a href="https://www.twitch.tv" class="social-link" aria-label="Twitch">🕹️</a>
-        <a href="https://www.instagram.com" class="social-link" aria-label="Instagram">📸</a>
-        <a href="https://twitter.com" class="social-link" aria-label="X/Twitter">🐦</a>
-    </section>
-    <section class="about" aria-label="About the Channel">
-        <h2>About the Channel</h2>
-        <p>UnityWolf Gaming focuses on immersive gameplay experiences across various genres, including action, adventure, and indie games. Join us for live streams every Friday and Saturday at 7 PM!</p>
-    </section>
-    <section class="contact" aria-label="Contact Information">
-        <h2>Contact</h2>
-        <p>Email us at: <a href="mailto:unitywolfgaming@example.com">unitywolfgaming@example.com</a></p>
-    </section>
+    <h1>Product Sales</h1>
+    <table id="sales-table" aria-label="Product Sales Data">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Sales</th>
+            </tr>
+        </thead>
+        <tbody id="sales-body"></tbody>
+    </table>
+    <div id="total-sales" aria-live="polite"></div>
+
     <script>
-        fetch('https://api.example.com/data') // Example API call
-            .then(response => response.json())
-            .then(data => console.log(data))
-            .catch(error => alert('Error loading data: ' + error));
+        async function fetchSalesData() {
+            try {
+                const response = await fetch('data:text/csv;charset=utf-8,cHJvZHVjdCxzYWxlcyxyZWdpb24KTGFwdG9wLDE1MDAwLE5vcnRoClBob25lLDgwMDAsSm91dGgKVGFibGV0LDUwMDAsRWFzdApNb25pdG9yLDMwMDAsSZIc3Q==');
+                const data = await response.text();
+                processSalesData(data);
+            } catch (error) {
+                document.getElementById('total-sales').textContent = 'Error fetching data. Please try again later.';
+                console.error('Fetch error:', error);
+            }
+        }
+
+        function processSalesData(data) {
+            const rows = data.split('\n').slice(1);
+            let totalSales = 0;
+            const salesBody = document.getElementById('sales-body');
+
+            rows.forEach(row => {
+                const [product, sales] = row.split(',');
+                if (product && sales) {
+                    const salesAmount = parseFloat(sales);
+                    totalSales += salesAmount;
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `<td>${product}</td><td>${salesAmount}</td>`;
+                    salesBody.appendChild(tr);
+                }
+            });
+
+            document.getElementById('total-sales').textContent = `Total Sales: ${totalSales}`;
+        }
+
+        fetchSalesData();
     </script>
 </body>
 </html>
