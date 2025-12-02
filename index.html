@@ -3,75 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product Sales</title>
+    <title>UnityWolf Gaming</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
             margin: 0;
-            padding: 20px;
-            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
-        table {
+        nav {
             width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
+            background: #1e1e1e;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-around;
         }
-        th, td {
-            border: 1px solid #dee2e6;
-            padding: 8px;
-            text-align: left;
+        nav a {
+            color: #e0e0e0;
+            text-decoration: none;
+            transition: color 0.3s;
         }
-        th {
-            background-color: #007bff;
-            color: white;
+        nav a:hover {
+            color: #00ffcc;
         }
-        #total-sales {
-            font-weight: bold;
-            margin-top: 20px;
+        #hero {
+            text-align: center;
+            padding: 5rem 1rem;
+            background: linear-gradient(135deg, #1a1a1a, #000);
+        }
+        #hero h1 {
+            font-size: 3rem;
+            margin: 0;
+        }
+        #hero p {
+            font-size: 1.5rem;
+            color: #00ffcc;
+        }
+        #about, #contact {
+            padding: 2rem;
+            width: 80%;
+            max-width: 800px;
+            margin: 2rem 0;
+            background: #1e1e1e;
+            border-radius: 8px;
+        }
+        #social-links {
+            display: flex;
+            justify-content: space-around;
+            margin: 1rem 0;
+        }
+        .social-button {
+            background: #00ffcc;
+            color: #121212;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .social-button:hover {
+            background: #00cc99;
+        }
+        img {
+            max-width: 200px;
+            margin: 2rem 0;
         }
     </style>
 </head>
 <body>
-    <h1>Product Sales Data</h1>
-    <div id="total-sales" aria-live="polite">Total Sales: $0</div>
-    <table id="sales-table" aria-label="Product Sales Table">
-        <thead>
-            <tr>
-                <th>Product</th>
-                <th>Sales</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-
+    <nav>
+        <a href="#hero">Home</a>
+        <a href="#about">About</a>
+        <a href="#social-links">Socials</a>
+        <a href="#contact">Contact</a>
+    </nav>
+    <section id="hero">
+        <img src="" alt="UnityWolf Gaming Logo" id="logo">
+        <h1>UnityWolf Gaming</h1>
+        <p>Unleashing the Power of Play!</p>
+    </section>
+    <section id="about">
+        <h2>About Us</h2>
+        <p>Welcome to UnityWolf Gaming, where we dive deep into the world of gaming! Join us for gaming tutorials, live streams, and engaging content that brings the community together.</p>
+    </section>
+    <section id="social-links">
+        <h2>Connect with Us</h2>
+        <button class="social-button" onclick="window.open('https://www.youtube.com', '_blank')">YouTube</button>
+        <button class="social-button" onclick="window.open('https://www.twitch.tv', '_blank')">Twitch</button>
+        <button class="social-button" onclick="window.open('https://www.instagram.com', '_blank')">Instagram</button>
+        <button class="social-button" onclick="window.open('https://twitter.com', '_blank')">X/Twitter</button>
+    </section>
+    <section id="contact">
+        <h2>Contact Us</h2>
+        <p>Email: <a href="mailto:unitywolfgaming@example.com">unitywolfgaming@example.com</a></p>
+    </section>
     <script>
-        async function fetchData() {
-            try {
-                const response = await fetch('data:text/csv;charset=utf-8,cHJvZHVjdCxzYWxlcyxyZWdpb24KTGFwdG9wLDE1MDAwLE5vcnRoClBob25lLDgwMDAsSm91dGgKVGFibGV0LDUwMDAsRWFzdApNb25pdG9yLDMwMDAsSZIc3Q==');
-                const data = await response.text();
-                const rows = data.split('\n').slice(1);
-                let totalSales = 0;
+        const LOGO_URL = 'https://via.placeholder.com/200'; // Replace with your logo URL
+        document.querySelector('#logo').src = LOGO_URL;
 
-                rows.forEach(row => {
-                    const [product, sales] = row.split(',');
-                    if (product && sales) {
-                        const salesAmount = parseInt(sales, 10);
-                        totalSales += salesAmount;
-
-                        const tableRow = document.createElement('tr');
-                        tableRow.innerHTML = `<td>${product}</td><td>${salesAmount}</td>`;
-                        document.querySelector('#sales-table tbody').appendChild(tableRow);
-                    }
-                });
-
-                document.querySelector('#total-sales').textContent = `Total Sales: $${totalSales}`;
-            } catch (error) {
-                document.querySelector('#total-sales').textContent = 'Error loading data.';
-                console.error('Error fetching data:', error);
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', fetchData);
+        // Validation checks
+        console.assert(!!document.querySelector('#social-links'), 'Social links section not found');
+        console.assert(document.querySelector('img').src.includes('http'), 'Logo URL is invalid');
+        console.assert(document.querySelector('a[href^="mailto:unitywolfgaming@example.com"]') !== null, 'Contact email link not found');
     </script>
 </body>
 </html>
