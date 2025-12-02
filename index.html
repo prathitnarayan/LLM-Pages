@@ -8,106 +8,94 @@
         body {
             margin: 0;
             font-family: Arial, sans-serif;
-            background-color: #121212;
-            color: #e0e0e0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            color: #fff;
+            background-color: #181818;
         }
-        nav {
-            width: 100%;
-            background: #1e1e1e;
-            padding: 1rem;
-            display: flex;
-            justify-content: space-around;
-        }
-        nav a {
-            color: #e0e0e0;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-        nav a:hover {
-            color: #00ffcc;
-        }
-        #hero {
+        header {
+            padding: 20px;
             text-align: center;
-            padding: 5rem 1rem;
-            background: linear-gradient(135deg, #1a1a1a, #000);
+            background-color: #282828;
         }
-        #hero h1 {
-            font-size: 3rem;
+        h1 {
+            font-size: 2.5rem;
             margin: 0;
         }
-        #hero p {
-            font-size: 1.5rem;
-            color: #00ffcc;
+        .hero {
+            text-align: center;
+            padding: 60px 20px;
+            background-color: #333;
         }
-        #about, #contact {
-            padding: 2rem;
-            width: 80%;
-            max-width: 800px;
-            margin: 2rem 0;
-            background: #1e1e1e;
-            border-radius: 8px;
+        .hero h2 {
+            font-size: 2rem;
+            margin: 10px 0;
         }
-        #social-links {
-            display: flex;
-            justify-content: space-around;
-            margin: 1rem 0;
-        }
-        .social-button {
-            background: #00ffcc;
-            color: #121212;
-            padding: 0.5rem 1rem;
+        .cta-button {
+            background-color: #e63946;
+            color: #fff;
+            padding: 15px 30px;
             border: none;
             border-radius: 5px;
+            font-size: 1.2rem;
             cursor: pointer;
-            transition: background 0.3s;
         }
-        .social-button:hover {
-            background: #00cc99;
+        #social-links {
+            text-align: center;
+            margin: 20px 0;
         }
-        img {
-            max-width: 200px;
-            margin: 2rem 0;
+        .social-link {
+            margin: 0 10px;
+            color: #e63946;
+            text-decoration: none;
+            font-size: 1.5rem;
+        }
+        .about, .contact {
+            padding: 20px;
+            background-color: #282828;
+            margin: 10px;
+            border-radius: 5px;
+        }
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2rem;
+            }
+            .hero h2 {
+                font-size: 1.5rem;
+            }
+            .cta-button {
+                font-size: 1rem;
+                padding: 10px 20px;
+            }
         }
     </style>
 </head>
 <body>
-    <nav>
-        <a href="#hero">Home</a>
-        <a href="#about">About</a>
-        <a href="#social-links">Socials</a>
-        <a href="#contact">Contact</a>
-    </nav>
-    <section id="hero">
-        <img src="" alt="UnityWolf Gaming Logo" id="logo">
+    <header aria-label="Header">
         <h1>UnityWolf Gaming</h1>
-        <p>Unleashing the Power of Play!</p>
+    </header>
+    <div class="hero" aria-label="Hero Section">
+        <h2>Join the Adventure!</h2>
+        <p>Watch epic gameplay and live streams</p>
+        <button class="cta-button" onclick="window.open('https://www.youtube.com', '_blank')">Watch on YouTube</button>
+    </div>
+    <section id="social-links" aria-label="Social Links">
+        <a href="https://www.youtube.com" class="social-link" aria-label="YouTube">🎥</a>
+        <a href="https://www.twitch.tv" class="social-link" aria-label="Twitch">🕹️</a>
+        <a href="https://www.instagram.com" class="social-link" aria-label="Instagram">📸</a>
+        <a href="https://twitter.com" class="social-link" aria-label="X/Twitter">🐦</a>
     </section>
-    <section id="about">
-        <h2>About Us</h2>
-        <p>Welcome to UnityWolf Gaming, where we dive deep into the world of gaming! Join us for gaming tutorials, live streams, and engaging content that brings the community together.</p>
+    <section class="about" aria-label="About the Channel">
+        <h2>About the Channel</h2>
+        <p>UnityWolf Gaming focuses on immersive gameplay experiences across various genres, including action, adventure, and indie games. Join us for live streams every Friday and Saturday at 7 PM!</p>
     </section>
-    <section id="social-links">
-        <h2>Connect with Us</h2>
-        <button class="social-button" onclick="window.open('https://www.youtube.com', '_blank')">YouTube</button>
-        <button class="social-button" onclick="window.open('https://www.twitch.tv', '_blank')">Twitch</button>
-        <button class="social-button" onclick="window.open('https://www.instagram.com', '_blank')">Instagram</button>
-        <button class="social-button" onclick="window.open('https://twitter.com', '_blank')">X/Twitter</button>
-    </section>
-    <section id="contact">
-        <h2>Contact Us</h2>
-        <p>Email: <a href="mailto:unitywolfgaming@example.com">unitywolfgaming@example.com</a></p>
+    <section class="contact" aria-label="Contact Information">
+        <h2>Contact</h2>
+        <p>Email us at: <a href="mailto:unitywolfgaming@example.com">unitywolfgaming@example.com</a></p>
     </section>
     <script>
-        const LOGO_URL = 'https://via.placeholder.com/200'; // Replace with your logo URL
-        document.querySelector('#logo').src = LOGO_URL;
-
-        // Validation checks
-        console.assert(!!document.querySelector('#social-links'), 'Social links section not found');
-        console.assert(document.querySelector('img').src.includes('http'), 'Logo URL is invalid');
-        console.assert(document.querySelector('a[href^="mailto:unitywolfgaming@example.com"]') !== null, 'Contact email link not found');
+        fetch('https://api.example.com/data') // Example API call
+            .then(response => response.json())
+            .then(data => console.log(data))
+            .catch(error => alert('Error loading data: ' + error));
     </script>
 </body>
 </html>
