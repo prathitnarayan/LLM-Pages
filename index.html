@@ -3,114 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather Dashboard</title>
+    <title>Product Sales</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
-        header { background: #007bff; color: white; padding: 1rem; text-align: center; }
-        .container { padding: 1rem; max-width: 600px; margin: auto; }
-        .search { display: flex; margin-bottom: 1rem; }
-        .search input { flex: 1; padding: 0.5rem; }
-        .search button { padding: 0.5rem; }
-        .weather-info { display: none; }
-        .error { color: red; }
-        @media (max-width: 600px) {
-            header { font-size: 1.5rem; }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        #total-sales {
+            font-weight: bold;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Weather Dashboard</h1>
-    </header>
-    <div class="container">
-        <div class="search" aria-label="Search for city">
-            <input type="text" id="city" placeholder="Enter city name" aria-required="true" />
-            <button id="searchBtn">Search</button>
-        </div>
-        <div id="weather" class="weather-info">
-            <h2 id="cityName"></h2>
-            <p>Temperature: <span id="temperature"></span>°C</p>
-            <p>Humidity: <span id="humidity"></span>%</p>
-            <img id="weatherIcon" alt="Weather icon" />
-        </div>
-        <div class="error" id="error" role="alert"></div>
-        <button id="settingsBtn">⚙️</button>
-    </div>
-
-    <div id="settingsModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.7); padding:2rem; color:white;">
-        <h2>Settings</h2>
-        <p>Please enter your OpenWeatherMap API Key: <a href="https://openweathermap.org/appid" target="_blank" style="color:yellow;">Get API Key</a></p>
-        <input type="text" id="apiKeyInput" placeholder="API Key" aria-required="true" />
-        <button id="saveApiKey">Save</button>
-        <button id="closeModal">Close</button>
-    </div>
-
+    <h1>Product Sales</h1>
+    <div id="total-sales" role="status" aria-live="polite">Total Sales: $0</div>
+    <table id="sales-table" aria-labelledby="sales-table">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Sales Amount</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const apiKey = localStorage.getItem('weatherApiKey');
-            const settingsModal = document.getElementById('settingsModal');
-            const errorDisplay = document.getElementById('error');
-
-            function showError(message) {
-                errorDisplay.textContent = message;
+        async function fetchData() {
+            try {
+                const response = await fetch('data:text/csv;base64,cHJvZHVjdCxzYWxlcyxyZWdpb24KTGFwdG9wLDE1MDAwLE5vcnRoClBob25lLDgwMDAsSm91dGgKVGFibGV0LDUwMDAsRWFzdApNb25pdG9yLDMwMDAsSZIc3Q==');
+                if (!response.ok) throw new Error('Network response was not ok');
+                const text = await response.text();
+                processData(text);
+            } catch (error) {
+                document.getElementById('total-sales').textContent = `Error fetching data: ${error.message}`;
             }
+        }
 
-            function hideError() {
-                errorDisplay.textContent = '';
-            }
-
-            if (!apiKey) {
-                settingsModal.style.display = 'block';
-            }
-
-            document.getElementById('searchBtn').addEventListener('click', function () {
-                const city = document.getElementById('city').value;
-                if (!city) {
-                    showError('Please enter a city name.');
-                    return;
-                }
-                fetchWeather(city);
+        function processData(csv) {
+            const lines = csv.split('\n').map(line => line.split(','));
+            let totalSales = 0;
+            const tableBody = document.querySelector('#sales-table tbody');
+            lines.forEach((line, index) => {
+                if (index === 0) return; // Skip header
+                const product = line[0];
+                const sales = parseFloat(line[1]) || 0;
+                totalSales += sales;
+                const row = document.createElement('tr');
+                row.innerHTML = `<td>${product}</td><td>$${sales.toLocaleString()}</td>`;
+                tableBody.appendChild(row);
             });
+            document.getElementById('total-sales').textContent = `Total Sales: $${totalSales.toLocaleString()}`;
+        }
 
-            document.getElementById('saveApiKey').addEventListener('click', function () {
-                const key = document.getElementById('apiKeyInput').value;
-                if (key) {
-                    localStorage.setItem('weatherApiKey', key);
-                    settingsModal.style.display = 'none';
-                } else {
-                    showError('API Key cannot be empty.');
-                }
-            });
-
-            document.getElementById('closeModal').addEventListener('click', function () {
-                settingsModal.style.display = 'none';
-            });
-
-            document.getElementById('settingsBtn').addEventListener('click', function () {
-                settingsModal.style.display = 'block';
-            });
-
-            function fetchWeather(city) {
-                const apiKey = localStorage.getItem('weatherApiKey');
-                fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Failed to fetch weather data. Please check your API key or city name.');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        hideError();
-                        document.getElementById('cityName').textContent = data.name;
-                        document.getElementById('temperature').textContent = data.main.temp;
-                        document.getElementById('humidity').textContent = data.main.humidity;
-                        document.getElementById('weatherIcon').src = `https://openweathermap.org/img/wn/${data.weather[0].icon}.png`;
-                        document.getElementById('weatherIcon').alt = data.weather[0].description;
-                        document.getElementById('weather').style.display = 'block';
-                    })
-                    .catch(error => showError(error.message));
-            }
-        });
+        fetchData();
     </script>
 </body>
 </html>
