@@ -1,9 +1,9 @@
 {
-  "task": "unitywolf-gaming",
+  "task": "unitywolf-gaming-landing",
   "task_id": "",
   "round": 1,
-  "brief": "Create a dark, modern, high-energy gaming channel landing page for 'UnityWolf Gaming'. The page must include: (1) A hero section with the title 'UnityWolf Gaming' and a bold gaming-themed tagline; (2) A placeholder logo image loaded from a constant string named LOGO_URL so the user can replace it easily; (3) Navigation bar with Home, About, Socials, Contact; (4) An About section describing the gaming channel; (5) A Social Media section with buttons for YouTube, Twitch, Instagram, and X/Twitter placed inside an element with id='social-links'; (6) A Contact section containing the email mailto:unitywolfgaming@example.com; (7) Neon accents, dark theme, responsive layout, and hover animations; (8) Entire output must be a single fully working HTML file with inline CSS and JavaScript.",
+  "brief": "Create a dark, high-energy gaming channel landing page for UnityWolf Gaming. Include: (1) a prominent text-based logo \"UnityWolf Gaming\" in the header, (2) a hero section with a bold title, short tagline, and a large \"Watch on YouTube\" primary CTA button, (3) social links section with icons or styled links for YouTube, Twitch, Instagram, and X/Twitter, (4) an \"About the Channel\" section describing the type of games and streaming schedule, (5) a \"Contact\" section that shows the email unitywolfgaming@example.com. Page must be responsive and look good on mobile and desktop.",
   "email": "25ds2000019@ds.study.iitm.ac.in",
-  "deployed_at": "2025-12-02 04:23:04 UTC",
+  "deployed_at": "2025-12-02 09:28:30 UTC",
   "deployment_count": "See commit history"
 }
