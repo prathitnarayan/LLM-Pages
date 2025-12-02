@@ -7,8 +7,9 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
-            padding: 0;
+            margin: 0;
+            padding: 20px;
+            background-color: #f8f9fa;
         }
         table {
             width: 100%;
@@ -16,12 +17,13 @@
             margin-top: 20px;
         }
         th, td {
-            border: 1px solid #ddd;
+            border: 1px solid #dee2e6;
             padding: 8px;
             text-align: left;
         }
         th {
-            background-color: #f2f2f2;
+            background-color: #007bff;
+            color: white;
         }
         #total-sales {
             font-weight: bold;
@@ -30,46 +32,46 @@
     </style>
 </head>
 <body>
-    <h1>Product Sales</h1>
-    <div id="total-sales" role="status" aria-live="polite">Total Sales: $0</div>
-    <table id="sales-table" aria-labelledby="sales-table">
+    <h1>Product Sales Data</h1>
+    <div id="total-sales" aria-live="polite">Total Sales: $0</div>
+    <table id="sales-table" aria-label="Product Sales Table">
         <thead>
             <tr>
                 <th>Product</th>
-                <th>Sales Amount</th>
+                <th>Sales</th>
             </tr>
         </thead>
         <tbody></tbody>
     </table>
+
     <script>
         async function fetchData() {
             try {
-                const response = await fetch('data:text/csv;base64,cHJvZHVjdCxzYWxlcyxyZWdpb24KTGFwdG9wLDE1MDAwLE5vcnRoClBob25lLDgwMDAsSm91dGgKVGFibGV0LDUwMDAsRWFzdApNb25pdG9yLDMwMDAsSZIc3Q==');
-                if (!response.ok) throw new Error('Network response was not ok');
-                const text = await response.text();
-                processData(text);
+                const response = await fetch('data:text/csv;charset=utf-8,cHJvZHVjdCxzYWxlcyxyZWdpb24KTGFwdG9wLDE1MDAwLE5vcnRoClBob25lLDgwMDAsSm91dGgKVGFibGV0LDUwMDAsRWFzdApNb25pdG9yLDMwMDAsSZIc3Q==');
+                const data = await response.text();
+                const rows = data.split('\n').slice(1);
+                let totalSales = 0;
+
+                rows.forEach(row => {
+                    const [product, sales] = row.split(',');
+                    if (product && sales) {
+                        const salesAmount = parseInt(sales, 10);
+                        totalSales += salesAmount;
+
+                        const tableRow = document.createElement('tr');
+                        tableRow.innerHTML = `<td>${product}</td><td>${salesAmount}</td>`;
+                        document.querySelector('#sales-table tbody').appendChild(tableRow);
+                    }
+                });
+
+                document.querySelector('#total-sales').textContent = `Total Sales: $${totalSales}`;
             } catch (error) {
-                document.getElementById('total-sales').textContent = `Error fetching data: ${error.message}`;
+                document.querySelector('#total-sales').textContent = 'Error loading data.';
+                console.error('Error fetching data:', error);
             }
         }
 
-        function processData(csv) {
-            const lines = csv.split('\n').map(line => line.split(','));
-            let totalSales = 0;
-            const tableBody = document.querySelector('#sales-table tbody');
-            lines.forEach((line, index) => {
-                if (index === 0) return; // Skip header
-                const product = line[0];
-                const sales = parseFloat(line[1]) || 0;
-                totalSales += sales;
-                const row = document.createElement('tr');
-                row.innerHTML = `<td>${product}</td><td>$${sales.toLocaleString()}</td>`;
-                tableBody.appendChild(row);
-            });
-            document.getElementById('total-sales').textContent = `Total Sales: $${totalSales.toLocaleString()}`;
-        }
-
-        fetchData();
+        document.addEventListener('DOMContentLoaded', fetchData);
     </script>
 </body>
 </html>
