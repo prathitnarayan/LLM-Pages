@@ -43,71 +43,79 @@
                     <th onclick="sortTable(5)">Volume</th>
                 </tr>
             </thead>
-            <tbody id="stocksBody"></tbody>
+            <tbody id="stocksBody" aria-live="polite"></tbody>
         </table>
     </div>
     <script>
-        const API_URL = 'https://api.example.com/stocks'; // Replace with actual API
         const API_KEY = 'd9bt4spr01qnupcrr420d9bt4spr01qnupcrr42g';
-        
-        document.getElementById('themeToggle').onclick = function() {
-            document.body.classList.toggle('dark-mode');
-        };
+        const stocksBody = document.getElementById('stocksBody');
+        const loadingIndicator = document.getElementById('loading');
+        const themeToggle = document.getElementById('themeToggle');
+        const searchInput = document.getElementById('search');
 
-        async function fetchStocks() {
-            document.getElementById('loading').classList.remove('hidden');
-            try {
-                const response = await fetch(`${API_URL}?apikey=${API_KEY}`);
-                if (!response.ok) throw new Error('Network response was not ok');
-                const data = await response.json();
-                populateTable(data.stocks);
-            } catch (error) {
-                console.error('Fetch error:', error);
-                alert('Failed to load stock data. Please try again later.');
-            } finally {
-                document.getElementById('loading').classList.add('hidden');
-            }
+        document.addEventListener('DOMContentLoaded', fetchStocks);
+        themeToggle.addEventListener('click', toggleTheme);
+        searchInput.addEventListener('input', filterStocks);
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
         }
 
-        function populateTable(stocks) {
-            const tbody = document.getElementById('stocksBody');
-            tbody.innerHTML = stocks.map(stock => `
-                <tr>
+        function fetchStocks() {
+            loadingIndicator.classList.remove('hidden');
+            fetch(`https://api.example.com/stocks?apikey=${API_KEY}`)
+                .then(response => response.json())
+                .then(data => {
+                    loadingIndicator.classList.add('hidden');
+                    displayStocks(data);
+                })
+                .catch(error => {
+                    loadingIndicator.classList.add('hidden');
+                    alert('Error fetching data: ' + error.message);
+                });
+        }
+
+        function displayStocks(data) {
+            stocksBody.innerHTML = '';
+            data.forEach(stock => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
                     <td>${stock.company}</td>
                     <td>${stock.ticker}</td>
                     <td>${stock.price}</td>
                     <td>${stock.change}</td>
                     <td>${stock.marketCap}</td>
                     <td>${stock.volume}</td>
-                </tr>
-            `).join('');
+                `;
+                row.addEventListener('click', () => openStockDetail(stock.ticker));
+                stocksBody.appendChild(row);
+            });
         }
 
-        function sortTable(columnIndex) {
-            const tbody = document.getElementById('stocksBody');
-            const rows = Array.from(tbody.querySelectorAll('tr'));
-            const isAscending = tbody.dataset.sortOrder === 'asc';
+        function openStockDetail(ticker) {
+            window.location.href = `stock.html?ticker=${ticker}`;
+        }
+
+        function filterStocks() {
+            const filter = searchInput.value.toLowerCase();
+            Array.from(stocksBody.getElementsByTagName('tr')).forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(filter) ? '' : 'none';
+            });
+        }
+
+        function sortTable(n) {
+            const rows = Array.from(stocksBody.rows);
+            const isAscending = !rows[0].cells[n].classList.contains('asc');
             rows.sort((a, b) => {
-                const aText = a.children[columnIndex].textContent;
-                const bText = b.children[columnIndex].textContent;
-                return isAscending ? aText.localeCompare(bText) : bText.localeCompare(aText);
+                const cellA = a.cells[n].textContent.trim();
+                const cellB = b.cells[n].textContent.trim();
+                return isAscending ? cellA.localeCompare(cellB) : cellB.localeCompare(cellA);
             });
-            tbody.innerHTML = '';
-            rows.forEach(row => tbody.appendChild(row));
-            tbody.dataset.sortOrder = isAscending ? 'desc' : 'asc';
+            rows.forEach(row => stocksBody.appendChild(row));
+            rows[0].cells[n].classList.toggle('asc', isAscending);
+            rows[0].cells[n].classList.toggle('desc', !isAscending);
         }
-
-        document.getElementById('search').addEventListener('input', function() {
-            const query = this.value.toLowerCase();
-            const rows = document.querySelectorAll('#stocksBody tr');
-            rows.forEach(row => {
-                const cells = row.querySelectorAll('td');
-                const isVisible = Array.from(cells).some(cell => cell.textContent.toLowerCase().includes(query));
-                row.style.display = isVisible ? '' : 'none';
-            });
-        });
-
-        fetchStocks();
     </script>
 </body>
 </html>
