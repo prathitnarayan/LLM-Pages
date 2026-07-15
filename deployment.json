@@ -2,7 +2,7 @@
   "task": "weather-dashboard",
   "task_id": "",
   "round": 2,
-  "brief": "When generating an application:\n\n- Determine whether the requested application requires live or external data.\n- If yes, automatically choose the best free public API or SDK.\n- Never leave placeholder fetch() functions.\n- Generate complete working JavaScript integration.\n- Use HTTPS APIs only.\n- Handle loading states, errors and empty responses.\n- Store API keys in a single CONFIG object.\n- If an API key is required, create a clear placeholder:\n    const CONFIG = {\n        API_KEY: \"YOUR_API_KEY_HERE\"\n    };\n- Never hardcode secrets.\n- Use fetch() with async/await.\n- Parse responses correctly.\n- Display meaningful error messages.",
-  "deployed_at": "2026-07-15 20:33:20 UTC",
+  "brief": "If the application requires external APIs:\n\n1. Automatically choose the most appropriate public API.\n2. State clearly whether the API requires an API key.\n3. If a key is required:\n   - Build a Settings panel where the user can paste their API key.\n   - Save it in localStorage.\n   - Never hardcode secrets.\n4. Show a friendly message if the API key is missing or invalid.\n5. If a free API exists that requires no key, prefer that API.",
+  "deployed_at": "2026-07-15 20:35:14 UTC",
   "deployment_count": "See commit history"
 }
