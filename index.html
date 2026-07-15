@@ -3,119 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock Screening Dashboard</title>
+    <title>Weather Dashboard</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; color: #333; transition: background-color 0.3s; }
-        header { background: #007bff; color: white; padding: 1em; text-align: center; }
-        .container { padding: 20px; }
-        .dark-mode { background-color: #333; color: white; }
-        .table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-        .table th, .table td { border: 1px solid #ddd; padding: 8px; }
-        .table th { background-color: #f2f2f2; cursor: pointer; }
-        .form-control { margin: 10px 0; width: 100%; padding: 10px; }
-        .btn { padding: 10px; background: #007bff; color: white; border: none; cursor: pointer; }
-        .btn:hover { background: #0056b3; }
-        .loading { display: none; }
-        #themeToggle { cursor: pointer; }
-        .hidden { display: none; }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f0f0f0;
+        }
+        input {
+            padding: 10px;
+            margin-right: 10px;
+            width: 200px;
+        }
+        button {
+            padding: 10px;
+        }
+        .weather-info {
+            margin-top: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .error {
+            color: red;
+        }
         @media (max-width: 600px) {
-            .table th, .table td { padding: 5px; }
-            .form-control { font-size: 14px; }
+            input {
+                width: 100%;
+                margin-bottom: 10px;
+            }
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Stock Screening Dashboard</h1>
-        <button id="themeToggle" aria-label="Toggle Dark/Light Mode">Toggle Dark/Light Mode</button>
-    </header>
-    <div class="container">
-        <input type="text" id="search" class="form-control" placeholder="Search stocks..." aria-label="Search stocks">
-        <div class="loading" id="loading" aria-live="polite">Loading...</div>
-        <table class="table" id="stocksTable" aria-label="Stocks Table">
-            <thead>
-                <tr>
-                    <th onclick="sortTable(0)">Company</th>
-                    <th onclick="sortTable(1)">Ticker</th>
-                    <th onclick="sortTable(2)">Price</th>
-                    <th onclick="sortTable(3)">Change</th>
-                    <th onclick="sortTable(4)">Market Cap</th>
-                    <th onclick="sortTable(5)">Volume</th>
-                </tr>
-            </thead>
-            <tbody id="stocksBody" aria-live="polite"></tbody>
-        </table>
+    <h1>Weather Dashboard</h1>
+    <div>
+        <input type="text" id="city" aria-label="City name" placeholder="Enter city name" required>
+        <button id="searchBtn">Search</button>
     </div>
+    <div id="weatherInfo" class="weather-info" role="alert" aria-live="polite"></div>
+    <div id="errorMsg" class="error" role="alert" aria-live="assertive"></div>
     <script>
-        const API_KEY = 'd9bt4spr01qnupcrr420d9bt4spr01qnupcrr42g';
-        const stocksBody = document.getElementById('stocksBody');
-        const loadingIndicator = document.getElementById('loading');
-        const themeToggle = document.getElementById('themeToggle');
-        const searchInput = document.getElementById('search');
+        const apiKey = 'YOUR_API_KEY';
+        document.getElementById('searchBtn').addEventListener('click', () => {
+            const city = document.getElementById('city').value.trim();
+            const weatherInfo = document.getElementById('weatherInfo');
+            const errorMsg = document.getElementById('errorMsg');
+            weatherInfo.innerHTML = '';
+            errorMsg.innerHTML = '';
 
-        document.addEventListener('DOMContentLoaded', fetchStocks);
-        themeToggle.addEventListener('click', toggleTheme);
-        searchInput.addEventListener('input', filterStocks);
+            if (!city) {
+                errorMsg.innerHTML = 'Please enter a city name.';
+                return;
+            }
 
-        function toggleTheme() {
-            document.body.classList.toggle('dark-mode');
-        }
-
-        function fetchStocks() {
-            loadingIndicator.classList.remove('hidden');
-            fetch(`https://api.example.com/stocks?apikey=${API_KEY}`)
-                .then(response => response.json())
+            fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('City not found. Please try again.');
+                    }
+                    return response.json();
+                })
                 .then(data => {
-                    loadingIndicator.classList.add('hidden');
-                    displayStocks(data);
+                    const temp = data.main.temp;
+                    const humidity = data.main.humidity;
+                    const icon = data.weather[0].icon;
+                    weatherInfo.innerHTML = `
+                        <h2>${data.name}</h2>
+                        <p>Temperature: ${temp}°C</p>
+                        <p>Humidity: ${humidity}%</p>
+                        <img src="http://openweathermap.org/img/wn/${icon}.png" alt="Weather icon" />
+                    `;
                 })
                 .catch(error => {
-                    loadingIndicator.classList.add('hidden');
-                    alert('Error fetching data: ' + error.message);
+                    errorMsg.innerHTML = error.message;
                 });
-        }
-
-        function displayStocks(data) {
-            stocksBody.innerHTML = '';
-            data.forEach(stock => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${stock.company}</td>
-                    <td>${stock.ticker}</td>
-                    <td>${stock.price}</td>
-                    <td>${stock.change}</td>
-                    <td>${stock.marketCap}</td>
-                    <td>${stock.volume}</td>
-                `;
-                row.addEventListener('click', () => openStockDetail(stock.ticker));
-                stocksBody.appendChild(row);
-            });
-        }
-
-        function openStockDetail(ticker) {
-            window.location.href = `stock.html?ticker=${ticker}`;
-        }
-
-        function filterStocks() {
-            const filter = searchInput.value.toLowerCase();
-            Array.from(stocksBody.getElementsByTagName('tr')).forEach(row => {
-                const text = row.textContent.toLowerCase();
-                row.style.display = text.includes(filter) ? '' : 'none';
-            });
-        }
-
-        function sortTable(n) {
-            const rows = Array.from(stocksBody.rows);
-            const isAscending = !rows[0].cells[n].classList.contains('asc');
-            rows.sort((a, b) => {
-                const cellA = a.cells[n].textContent.trim();
-                const cellB = b.cells[n].textContent.trim();
-                return isAscending ? cellA.localeCompare(cellB) : cellB.localeCompare(cellA);
-            });
-            rows.forEach(row => stocksBody.appendChild(row));
-            rows[0].cells[n].classList.toggle('asc', isAscending);
-            rows[0].cells[n].classList.toggle('desc', !isAscending);
-        }
+        });
     </script>
 </body>
 </html>
