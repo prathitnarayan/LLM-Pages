@@ -3,60 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Cricket App</title>
+    <title>Stock Screening Dashboard</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
-        .container { max-width: 600px; margin: auto; padding: 1rem; }
-        header { text-align: center; padding: 1rem; background: #f4f4f4; }
-        .match { border: 1px solid #ccc; margin: 1rem 0; padding: 1rem; border-radius: 5px; }
-        .error { color: red; }
-        .notification { background: #e7f3fe; border-left: 6px solid #2196F3; padding: 0.5rem; margin: 1rem 0; }
-        footer { text-align: center; padding: 1rem; background: #f4f4f4; }
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; color: #333; }
+        header { background: #007bff; color: white; padding: 1em; text-align: center; }
+        .container { padding: 20px; }
+        .dark-mode { background-color: #333; color: white; }
+        .table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        .table th, .table td { border: 1px solid #ddd; padding: 8px; }
+        .table th { background-color: #f2f2f2; cursor: pointer; }
+        .form-control { margin: 10px 0; }
+        .btn { padding: 10px; background: #007bff; color: white; border: none; cursor: pointer; }
+        .btn:hover { background: #0056b3; }
+        .loading { display: none; }
+        #themeToggle { cursor: pointer; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
     <header>
-        <h1>Live Cricket Tracker</h1>
+        <h1>Stock Screening Dashboard</h1>
+        <button id="themeToggle">Toggle Dark/Light Mode</button>
     </header>
     <div class="container">
-        <div id="liveMatches" class="match"></div>
-        <div id="error" class="error"></div>
+        <input type="text" id="search" class="form-control" placeholder="Search stocks...">
+        <div class="loading" id="loading">Loading...</div>
+        <table class="table" id="stocksTable">
+            <thead>
+                <tr>
+                    <th onclick="sortTable(0)">Company</th>
+                    <th onclick="sortTable(1)">Ticker</th>
+                    <th onclick="sortTable(2)">Price</th>
+                    <th onclick="sortTable(3)">Change</th>
+                    <th onclick="sortTable(4)">Market Cap</th>
+                    <th onclick="sortTable(5)">Volume</th>
+                </tr>
+            </thead>
+            <tbody id="stocksBody"></tbody>
+        </table>
     </div>
-    <footer>
-        <p>&copy; 2023 Live Cricket App</p>
-    </footer>
     <script>
-        async function fetchLiveMatches() {
+        const API_URL = 'https://api.example.com/stocks'; // Replace with actual API
+        const stocksBody = document.getElementById('stocksBody');
+        const loading = document.getElementById('loading');
+
+        async function fetchStocks() {
+            loading.classList.remove('hidden');
             try {
-                const response = await fetch('https://api.example.com/live-matches');
+                const response = await fetch(API_URL);
                 if (!response.ok) throw new Error('Network response was not ok');
                 const data = await response.json();
-                displayLiveMatches(data);
+                displayStocks(data);
             } catch (error) {
-                document.getElementById('error').innerText = 'Failed to fetch live matches: ' + error.message;
+                alert('Error fetching data: ' + error.message);
+            } finally {
+                loading.classList.add('hidden');
             }
         }
 
-        function displayLiveMatches(matches) {
-            const liveMatchesDiv = document.getElementById('liveMatches');
-            if (matches.length === 0) {
-                liveMatchesDiv.innerHTML = '<p>No live matches currently.</p>';
-                return;
-            }
-            liveMatchesDiv.innerHTML = matches.map(match => `
-                <div>
-                    <h2>${match.teams[0]} vs ${match.teams[1]}</h2>
-                    <p>Status: ${match.status}</p>
-                    <p>Score: ${match.score}</p>
-                    <p>Overs: ${match.overs}</p>
-                    <p>Current Batsmen: ${match.batsmen.join(', ')}</p>
-                    <p>Bowler: ${match.bowler}</p>
-                </div>
-            `).join('');
+        function displayStocks(stocks) {
+            stocksBody.innerHTML = '';
+            stocks.forEach(stock => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${stock.company}</td>
+                    <td>${stock.ticker}</td>
+                    <td>${stock.price}</td>
+                    <td>${stock.change}</td>
+                    <td>${stock.marketCap}</td>
+                    <td>${stock.volume}</td>
+                `;
+                row.onclick = () => alert('Clicked on ' + stock.company);
+                stocksBody.appendChild(row);
+            });
         }
 
-        fetchLiveMatches();
-        setInterval(fetchLiveMatches, 5000);
+        function sortTable(n) {
+            const rows = Array.from(stocksBody.rows);
+            const sortedRows = rows.sort((a, b) => {
+                const aText = a.cells[n].innerText;
+                const bText = b.cells[n].innerText;
+                return isNaN(aText) ? aText.localeCompare(bText) : parseFloat(aText) - parseFloat(bText);
+            });
+            stocksBody.innerHTML = '';
+            sortedRows.forEach(row => stocksBody.appendChild(row));
+        }
+
+        document.getElementById('themeToggle').onclick = () => {
+            document.body.classList.toggle('dark-mode');
+        };
+
+        document.getElementById('search').addEventListener('input', function() {
+            const filter = this.value.toLowerCase();
+            Array.from(stocksBody.rows).forEach(row => {
+                const text = row.innerText.toLowerCase();
+                row.style.display = text.includes(filter) ? '' : 'none';
+            });
+        });
+
+        window.onload = fetchStocks;
     </script>
 </body>
 </html>
