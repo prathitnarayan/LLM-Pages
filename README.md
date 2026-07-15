@@ -2,10 +2,26 @@
 This repository hosts automatically generated web applications. The codebase is **completely replaced** on each deployment.
 ## 🚀 Current Deployment
 **Task:** weather-dashboard
-**Round:** 1
-**Deployed:** 2026-07-15 20:25:41 UTC
+**Round:** 2
+**Deployed:** 2026-07-15 20:33:20 UTC
 ### Description
-A responsive weather dashboard with city search, current temperature, humidity, and weather icons.
+When generating an application:
+
+- Determine whether the requested application requires live or external data.
+- If yes, automatically choose the best free public API or SDK.
+- Never leave placeholder fetch() functions.
+- Generate complete working JavaScript integration.
+- Use HTTPS APIs only.
+- Handle loading states, errors and empty responses.
+- Store API keys in a single CONFIG object.
+- If an API key is required, create a clear placeholder:
+    const CONFIG = {
+        API_KEY: "YOUR_API_KEY_HERE"
+    };
+- Never hardcode secrets.
+- Use fetch() with async/await.
+- Parse responses correctly.
+- Display meaningful error messages.
 ## 🌐 Live Application
 **[View Current App](https://prathitnarayan.github.io/LLM-Pages/)**
 ---
@@ -18,8 +34,12 @@ A responsive weather dashboard with city search, current temperature, humidity, 
 This README is updated with each deployment. Previous deployments are tracked in commit history.
 ### Latest Changes
 - **Task:** weather-dashboard
-- **Brief:** A responsive weather dashboard with city search, current temperature, humidity, and weather icons.
-- **Round:** 1
-- **Timestamp:** 2026-07-15 20:25:41 UTC
+- **Brief:** When generating an application:
+
+- Determine whether the requested application requires live or external data.
+- If yes, automatically choose the best free public API or SDK.
+- Never leave placeholder...
+- **Round:** 2
+- **Timestamp:** 2026-07-15 20:33:20 UTC
 ---
-*Powered by AI Project Generator | Last updated: 2026-07-15 20:25:41 UTC*
+*Powered by AI Project Generator | Last updated: 2026-07-15 20:33:20 UTC*
