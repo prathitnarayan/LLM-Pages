@@ -1,9 +1,8 @@
 {
-  "task": "Screener_Stock_AI",
+  "task": "weather-dashboard",
   "task_id": "",
-  "round": 2,
-  "brief": "Build a modern stock screening website with a clean and professional design similar to Finviz or Tickertape. The homepage should have a dashboard showing major market indices, top gainers, top losers, and trending stocks. Add a stock screener where users can filter stocks by market cap, price, sector, P/E ratio, dividend yield, volume, and 52-week high/low. Display the results in a sortable table with company name, ticker symbol, current price, daily change, market cap, and volume. When a user clicks on a stock, open a detailed page showing the company profile, current price, price chart, key financial metrics, recent news, and basic technical indicators. Include a search bar, responsive design for desktop and mobile, smooth animations, dark and light mode, loading animations, and a clean finance-themed UI. The website should fetch live stock data from a free API instead of using mock data.use API key \"d9bt4spr01qnupcrr420d9bt4spr01qnupcrr42g\" for this endpoint. Also make it a bit more asthetic and add some live chart feeds just like a grafana dashboard",
-  "email": "pnsprat411@gmail.com",
-  "deployed_at": "2026-07-15 18:36:56 UTC",
+  "round": 1,
+  "brief": "A responsive weather dashboard with city search, current temperature, humidity, and weather icons.",
+  "deployed_at": "2026-07-15 20:15:00 UTC",
   "deployment_count": "See commit history"
 }
