@@ -3,139 +3,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock Screening App</title>
+    <title>Stock Screener</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
-        header { background: #007BFF; color: white; padding: 10px; text-align: center; }
-        .container { padding: 20px; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        th, td { padding: 10px; text-align: left; border: 1px solid #ddd; }
-        th { cursor: pointer; background: #f2f2f2; }
-        input, select { margin-bottom: 10px; padding: 10px; width: calc(100% - 22px); }
-        .watchlist { margin-top: 20px; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; }
-        .modal-content { background: white; padding: 20px; border-radius: 5px; }
-        .close { cursor: pointer; color: red; float: right; }
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+        h1 { text-align: center; }
         .loading { display: none; }
-        @media (max-width: 600px) { th, td { font-size: 12px; } }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
+        th { cursor: pointer; }
+        .hidden { display: none; }
+        .error { color: red; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+        .modal-content { background: white; padding: 20px; margin: 15% auto; width: 80%; }
+        @media (max-width: 600px) {
+            th, td { font-size: 14px; }
+        }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Stock Screening App</h1>
-    </header>
-    <div class="container">
-        <input type="text" id="search" placeholder="Search by company name or ticker..." aria-label="Search stocks">
-        <button id="fetchData">Search</button>
+    <h1>Stock Screener</h1>
+    <div>
+        <input type="text" id="search" placeholder="Search by company name or ticker" aria-label="Search stock">
+        <button id="fetchBtn">Fetch Stocks</button>
+        <div id="apiSettings" class="hidden">
+            <input type="text" id="apiKey" placeholder="Enter API Key" aria-label="API Key">
+            <button id="saveApiKey">Save API Key</button>
+        </div>
         <div class="loading" id="loading">Loading...</div>
-        <div id="error" style="color: red;"></div>
-        <table id="stockTable">
-            <thead>
-                <tr>
-                    <th onclick="sortTable(0)">Company Name</th>
-                    <th onclick="sortTable(1)">Stock Symbol</th>
-                    <th onclick="sortTable(2)">Current Price</th>
-                    <th onclick="sortTable(3)">Daily Change (%)</th>
-                    <th onclick="sortTable(4)">Market Cap</th>
-                    <th onclick="sortTable(5)">Volume</th>
-                    <th onclick="sortTable(6)">52 Week High</th>
-                    <th onclick="sortTable(7)">52 Week Low</th>
-                </tr>
-            </thead>
-            <tbody id="stockData"></tbody>
-        </table>
-        <div class="watchlist">
-            <h2>Watchlist</h2>
-            <ul id="watchlistItems"></ul>
-        </div>
-        <div id="apiSettings">
-            <h2>API Settings</h2>
-            <input type="text" id="apiKey" placeholder="Enter your API Key" aria-label="API Key">
-            <button id="saveKey">Save Key</button>
-        </div>
+        <div class="error" id="errorMessage"></div>
     </div>
-    <div class="modal" id="stockModal">
+    <table id="stockTable">
+        <thead>
+            <tr>
+                <th onclick="sortTable(0)">Company Name</th>
+                <th onclick="sortTable(1)">Ticker</th>
+                <th onclick="sortTable(2)">Current Price</th>
+                <th onclick="sortTable(3)">Daily Change %</th>
+                <th onclick="sortTable(4)">Market Cap</th>
+                <th onclick="sortTable(5)">Volume</th>
+                <th onclick="sortTable(6)">Sector</th>
+            </tr>
+        </thead>
+        <tbody id="stockBody"></tbody>
+    </table>
+    <div id="watchlist"></div>
+    <div class="modal" id="modal">
         <div class="modal-content">
-            <span class="close" id="closeModal">&times;</span>
+            <span id="closeModal" style="cursor:pointer;">&times;</span>
             <h2 id="modalTitle"></h2>
             <div id="modalDetails"></div>
         </div>
     </div>
     <script>
-        const apiKey = localStorage.getItem('apiKey');
-        const apiUrl = `https://financialmodelingprep.com/api/v3/stock/real-time-price/AAPL?apikey=${apiKey || 'demo'}`;
-        document.getElementById('apiKey').value = apiKey || '';
-        
-        document.getElementById('saveKey').onclick = () => {
-            const key = document.getElementById('apiKey').value;
-            localStorage.setItem('apiKey', key);
-            alert('API Key saved!');
+        const apiUrl = 'https://financialmodelingprep.com/api/v3/stock/real-time-price/';
+        let apiKey = localStorage.getItem('apiKey') || '';
+        const stockBody = document.getElementById('stockBody');
+        const loading = document.getElementById('loading');
+        const errorMessage = document.getElementById('errorMessage');
+        const modal = document.getElementById('modal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalDetails = document.getElementById('modalDetails');
+
+        document.getElementById('apiKey').value = apiKey;
+
+        document.getElementById('saveApiKey').onclick = () => {
+            apiKey = document.getElementById('apiKey').value;
+            localStorage.setItem('apiKey', apiKey);
+            document.getElementById('apiSettings').classList.add('hidden');
+            fetchStocks();
         };
 
-        document.getElementById('fetchData').onclick = async () => {
-            const search = document.getElementById('search').value;
-            if (!search) return alert('Please enter a stock symbol or company name.');
-            document.getElementById('loading').style.display = 'block';
-            document.getElementById('error').innerText = '';
-            try {
-                const response = await fetch(`https://financialmodelingprep.com/api/v3/stock/real-time-price/${search}?apikey=${apiKey || 'demo'}`);
-                if (!response.ok) throw new Error('Network response was not ok');
-                const data = await response.json();
-                if (data.length === 0) throw new Error('No results found');
-                displayStocks(data);
-            } catch (error) {
-                document.getElementById('error').innerText = error.message;
-            } finally {
-                document.getElementById('loading').style.display = 'none';
+        document.getElementById('fetchBtn').onclick = fetchStocks;
+
+        function fetchStocks() {
+            loading.style.display = 'block';
+            errorMessage.textContent = '';
+            stockBody.innerHTML = '';
+            if (!apiKey) {
+                document.getElementById('apiSettings').classList.remove('hidden');
+                loading.style.display = 'none';
+                return;
             }
-        };
-
-        function displayStocks(data) {
-            const stockData = document.getElementById('stockData');
-            stockData.innerHTML = '';
-            data.forEach(stock => {
-                const row = document.createElement('tr');
-                row.innerHTML = `<td>${stock.companyName}</td>
-                                <td>${stock.symbol}</td>
-                                <td>${stock.price}</td>
-                                <td>${stock.changePercent}</td>
-                                <td>${stock.marketCap}</td>
-                                <td>${stock.volume}</td>
-                                <td>${stock.high}</td>
-                                <td>${stock.low}</td>`;
-                row.onclick = () => showModal(stock);
-                stockData.appendChild(row);
-            });
+            fetch(`${apiUrl}?apikey=${apiKey}`)
+                .then(response => {
+                    if (!response.ok) throw new Error('Invalid API Key or response');
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.length === 0) throw new Error('No data found');
+                    data.forEach(stock => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${stock.companyName}</td>
+                            <td>${stock.symbol}</td>
+                            <td>${stock.price}</td>
+                            <td>${stock.changePercent}</td>
+                            <td>${stock.marketCap}</td>
+                            <td>${stock.volume}</td>
+                            <td>${stock.sector}</td>
+                        `;
+                        row.onclick = () => showModal(stock);
+                        stockBody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    errorMessage.textContent = error.message;
+                })
+                .finally(() => loading.style.display = 'none');
         }
 
         function showModal(stock) {
-            document.getElementById('modalTitle').innerText = stock.companyName;
-            document.getElementById('modalDetails').innerHTML = `
-                <p>Live Price: ${stock.price}</p>
-                <p>Previous Close: ${stock.previousClose}</p>
-                <p>Open Price: ${stock.open}</p>
-                <p>High: ${stock.high}</p>
-                <p>Low: ${stock.low}</p>
+            modalTitle.textContent = stock.companyName;
+            modalDetails.innerHTML = `
+                <p>Ticker: ${stock.symbol}</p>
+                <p>Current Price: ${stock.price}</p>
+                <p>Daily Change %: ${stock.changePercent}</p>
+                <p>Market Cap: ${stock.marketCap}</p>
                 <p>Volume: ${stock.volume}</p>
-                <p>Company Info: ${stock.description}</p>`;
-            document.getElementById('stockModal').style.display = 'flex';
+                <p>Sector: ${stock.sector}</p>
+            `;
+            modal.style.display = 'block';
         }
 
         document.getElementById('closeModal').onclick = () => {
-            document.getElementById('stockModal').style.display = 'none';
+            modal.style.display = 'none';
         };
 
         function sortTable(columnIndex) {
-            const table = document.getElementById('stockTable');
-            const rows = Array.from(table.rows).slice(1);
-            const isAscending = table.rows[0].cells[columnIndex].getAttribute('data-sort') === 'asc';
+            const rows = Array.from(stockBody.querySelectorAll('tr'));
             rows.sort((a, b) => {
-                const aText = a.cells[columnIndex].innerText;
-                const bText = b.cells[columnIndex].innerText;
-                return (isAscending ? aText < bText : aText > bText) ? 1 : -1;
+                const aText = a.children[columnIndex].textContent.trim();
+                const bText = b.children[columnIndex].textContent.trim();
+                return aText.localeCompare(bText, undefined, {numeric: true});
             });
-            rows.forEach(row => table.appendChild(row));
-            table.rows[0].cells[columnIndex].setAttribute('data-sort', isAscending ? 'desc' : 'asc');
+            stockBody.innerHTML = '';
+            rows.forEach(row => stockBody.appendChild(row));
         }
     </script>
 </body>
