@@ -3,76 +3,60 @@ This repository hosts automatically generated web applications. The codebase is 
 ## 🚀 Current Deployment
 **Task:** StockMarket
 **Round:** 1
-**Deployed:** 2026-07-16 05:07:32 UTC
+**Deployed:** 2026-07-16 05:09:45 UTC
 ### Description
-Build a modern, professional Stock Screening web application similar to Finviz or TradingView.
+Build ONLY a stock screening application.
 
-The application must fetch real-time stock market data using a free public stock market API.
+This is NOT a weather application.
+This is NOT a cryptocurrency application.
+This is NOT a finance dashboard with dummy data.
+
+The application MUST be a stock screener.
 
 Requirements:
 
-• Allow users to search for stocks by company name or ticker symbol.
+- Fetch real-time stock market data using a stock market API.
+- Automatically select the most suitable free stock API.
+- Do not use any weather APIs.
+- Do not generate weather-related UI or functionality.
+- Do not generate placeholder or dummy stock data.
 
-• Display a responsive table containing:
+Features:
+
+- Search by company name or ticker symbol.
+- Display:
   - Company Name
-  - Stock Symbol
+  - Ticker
   - Current Price
-  - Daily Change (%)
+  - Daily Change %
   - Market Cap
   - Volume
-  - 52 Week High
-  - 52 Week Low
-
-• Allow sorting on every column.
-
-• Allow filtering by:
+  - Sector
+- Sort by every column.
+- Filter by:
+  - Sector
+  - Price
   - Market Cap
-  - Price Range
   - Daily Gain/Loss
-  - Volume
+- Responsive table.
+- Watchlist saved in localStorage.
+- Detailed stock modal.
+- Interactive price chart.
+- Loading indicators.
+- Error handling.
+- Empty-state UI.
 
-• Include a watchlist where users can bookmark stocks.
-  Save the watchlist using localStorage.
+If the selected stock API requires an API key:
 
-• Clicking a stock should open a detailed modal containing:
-  - Live Price
-  - Previous Close
-  - Open Price
-  - High
-  - Low
-  - Volume
-  - Company Information
+- Automatically generate an "API Settings" panel.
+- Save the key in localStorage.
+- Restore it automatically.
+- Validate it before making requests.
+- Show helpful error messages.
 
-• Display an interactive price chart for the selected stock.
+Generate a complete standalone index.html with inline CSS and JavaScript.
 
-• Automatically determine the most appropriate free stock market API.
-
-• If the chosen API requires an API key:
-  - Generate a collapsible "API Settings" panel.
-  - Allow users to enter their API key.
-  - Save the key in localStorage.
-  - Automatically restore it on page load.
-  - Validate the API key before using it.
-  - Display clear error messages if the key is invalid.
-
-• If a free API without authentication is available, prefer that API.
-
-• Implement loading indicators while fetching market data.
-
-• Handle:
-  - Invalid stock symbols
-  - Network failures
-  - API rate limits
-  - Empty search results
-
-• Make the UI fully responsive for desktop, tablet, and mobile.
-
-• Use modern cards, smooth animations, hover effects, and a professional dashboard layout.
-
-• Generate everything in a single standalone index.html with inline CSS and JavaScript.
-
-Do not use dummy or static stock data.
-Always fetch live market data from the selected API.
+Do not generate any weather-related code.
 ## 🌐 Live Application
 **[View Current App](https://prathitnarayan.github.io/LLM-Pages/)**
 ---
@@ -85,12 +69,14 @@ Always fetch live market data from the selected API.
 This README is updated with each deployment. Previous deployments are tracked in commit history.
 ### Latest Changes
 - **Task:** StockMarket
-- **Brief:** Build a modern, professional Stock Screening web application similar to Finviz or TradingView.
+- **Brief:** Build ONLY a stock screening application.
 
-The application must fetch real-time stock market data using a free public stock market API.
+This is NOT a weather application.
+This is NOT a cryptocurrency application.
+This is NOT a finance dashboard with dummy data.
 
-Requiremen...
+The application MUST be a stoc...
 - **Round:** 1
-- **Timestamp:** 2026-07-16 05:07:32 UTC
+- **Timestamp:** 2026-07-16 05:09:45 UTC
 ---
-*Powered by AI Project Generator | Last updated: 2026-07-16 05:07:32 UTC*
+*Powered by AI Project Generator | Last updated: 2026-07-16 05:09:45 UTC*
